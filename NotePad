@@ -1,0 +1,221 @@
+package com.company;
+
+
+import javax.swing.*;
+//import javax.swing.text.DefaultHighlighter;
+//import javax.swing.text.Highlighter;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Scanner;
+import java.io.*;
+
+public class NotePad implements ActionListener{
+
+    //private Highlighter.HighlightPainter painter;
+
+    //main frame & listener
+    private JFrame mainFrame; // dealer Jframe
+    private ActionListener actionListener; // dealer Listener for later on clicks
+
+    //Dialog frame & listener
+    private JFrame dialogFrame; // dealer Jframe
+    private ActionListener actionListenerDialog;
+
+    //main text area
+    private TextArea textArea;
+    //Dialog Text area
+    private TextArea dialogTextArea;
+
+    //Buttons for Dialog
+    private Button buttonOne;
+    private Button buttonTwo;
+    private Button buttonThree;
+
+
+    // menu on top of main frame
+    private MenuBar menuBar; // dealer a menu bar item
+    private Menu file; // make menu named File stuff
+    private Menu textTools; // will have options like compare
+    //Options in the File menu
+    private MenuItem openFile; // open
+    private MenuItem saveFile; // save
+    private MenuItem close; // close
+    //Options in textTools Menu
+    private MenuItem search; // will search for a string
+
+    // constructor
+    public NotePad() {
+
+        mainFrame = new JFrame(); //main frame
+
+        textArea = new TextArea("",0,0, TextArea.SCROLLBARS_VERTICAL_ONLY); // size will be set through mainFrame
+        textArea.setFont(new Font("Century Gothic", Font.BOLD, 12)); // set font name, type, and size
+
+
+        menuBar = new MenuBar();
+        // initialize file menu and options
+        file = new Menu();
+        openFile = new MenuItem();
+        saveFile = new MenuItem();
+        close = new MenuItem();
+        // initialize textTools menu and options
+        textTools = new Menu();
+        search = new MenuItem();
+
+        // add stuff on top of our JFrame
+        setJframe();
+
+
+        // lets work with the menu and add all the menu options to it
+        setMenuAndOptions();
+
+
+    }
+
+    private void setJframe(){
+        mainFrame.setSize(500,300); // give size for the frame
+        mainFrame.setTitle("Java Note Pad"); // give the frame a name to show on top
+        mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // exit the frame when it gets closed
+        // add text area to GUI and set the size to fill the whole frame
+        mainFrame.getContentPane().setLayout(new BorderLayout()); // make it fill the whole area and set borders
+        mainFrame.getContentPane().add(textArea);  // add text area to the frame
+        // add menu bar to GUI
+        mainFrame.setMenuBar(menuBar);
+        mainFrame.getMenuBar().add(file); // add the menu for file, config later
+        mainFrame.getMenuBar().add(textTools);// add the menu for textTools, config later
+        // Make Everything Visible
+        mainFrame.setVisible(true);
+
+    }
+
+    private void setDialogJframe(String topName,String buttonOneName, String buttonTwoName, String buttonThreeName){
+        dialogFrame = new JFrame(); // Dialog frame
+
+
+        dialogTextArea = new TextArea(1,15); // size will be set through mainFrame
+        dialogTextArea.setFont(new Font("Century Gothic", Font.BOLD, 9)); // set font name, type, and size
+        dialogTextArea.setEditable(true);
+
+        dialogFrame.setSize(400,150); // give size for the frame
+        dialogFrame.setTitle(topName); // give the frame a name to show on top
+        // add text area to GUI and set the size to fill the whole frame
+        dialogFrame.setLayout(new FlowLayout());
+        dialogFrame.getContentPane().add(dialogTextArea);  // add text area to the frame
+
+
+        if(buttonOneName.length()>2){
+            buttonOne = new Button(buttonOneName);
+            dialogFrame.add(buttonOne);
+            buttonOne.addActionListener(this);
+        }
+        if(buttonTwoName.length()>2) {
+            buttonTwo = new Button(buttonTwoName);
+            dialogFrame.add(buttonTwo);
+            buttonOne.addActionListener(this);
+        }
+        if(buttonThreeName.length()>3) {
+            buttonThree = new Button(buttonThreeName);
+            dialogFrame.add(buttonThree);
+            buttonOne.addActionListener(this);
+        }
+
+
+        dialogFrame.setVisible(true);
+
+    }
+
+    private void setMenuAndOptions(){
+
+        //config File menu & options
+        file.setLabel("File");
+        // Make the Open Option
+        openFile.setLabel("Open"); // give it a name
+        openFile.addActionListener(this); // add a listener, so we know if it has been clicked
+        openFile.setShortcut(new MenuShortcut(KeyEvent.VK_0, false)); // make a keyboard shortcut
+        file.add(openFile); // add the menu option to menu
+
+        //make save option
+        saveFile.setLabel("Save"); // give it a name
+        saveFile.addActionListener(this); // add a listener, so we know if it has been clicked
+        saveFile.setShortcut(new MenuShortcut(KeyEvent.VK_S, false)); // make a keyboard shortcut
+        file.add(saveFile); // add the menu option to menu
+
+        //make close option
+        close.setLabel("Close"); // give it a name
+        close.addActionListener(this); // add a listener, so we know if it has been clicked
+        close.setShortcut(new MenuShortcut(KeyEvent.VK_F4, false)); // make a keyboard shortcut
+        file.add(close); // add the menu option to menu
+
+        //config File menu & options
+        textTools.setLabel("Text Tools");
+        //make tge compareLines
+        search.setLabel("Compare two lines");
+        search.addActionListener(this); // add a listener, so we know if it has been clicked
+        search.setShortcut(new MenuShortcut(KeyEvent.VK_T, false)); // make a keyboard shortcut
+        textTools.add(search);
+
+    }
+
+    private void makeDialogWindow(){
+
+
+
+
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == close)
+            mainFrame.dispose(); // Blow frame up and close
+
+        else if(e.getSource() == openFile) {
+
+            JFileChooser open = new JFileChooser(); // open a box so user can pick a file
+            int option = open.showOpenDialog(mainFrame); // get the option that user selected ????
+
+            if(option == JFileChooser.APPROVE_OPTION){
+                textArea.setText(""); // clear the text area
+
+                try{
+                    // make a scanner and try to open the file
+                    Scanner scan = new Scanner(new FileReader(open.getSelectedFile().getPath()));
+
+                    while(scan.hasNext())
+                        textArea.append(scan.nextLine() + "\n");
+
+                } catch( Exception exc) {
+                    System.out.println(exc.getMessage());
+                }
+
+
+            }
+        }
+
+        else if(e.getSource() == search || e.getSource() == buttonOne || e.getSource() == buttonTwo){
+            if(e.getSource() == search )
+                setDialogJframe("Search","Find Next","Find All", "close");
+            if(e.getSource() == buttonOne){
+                String text = textArea.getText();
+
+
+            }
+            else if(e.getSource() == buttonTwo) {
+                String text = textArea.getText();
+                String find_text = dialogTextArea.getText();
+              //painter = DefaultHighlighter.DefaultHighlightPainter();
+                int index = 0;
+                while ((index = text.indexOf(find_text, index)) != -1) // update and check in one go
+                {
+                    // do something using index
+                    index += find_text.length();
+                }
+
+            }
+
+
+
+
+        }
+
+    }
+
+}
